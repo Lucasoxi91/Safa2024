@@ -23,7 +23,8 @@ def execute_query():
                 cur.execute("""
 WITH AlunosSimulado AS (
     SELECT 
-        'Tauá' AS municipio,  -- Substituindo escola por município fixo
+        'Tauá' AS municipio,  -- Fixo como 'Tauá' para todos os registros
+        i.name AS instituicao,  -- Nome da instituição
         q.name AS nome_simulado,
         CASE 
             WHEN q.name LIKE '%LP%' THEN 'Língua Portuguesa'
@@ -38,17 +39,18 @@ WITH AlunosSimulado AS (
     INNER JOIN institution_classrooms ic ON ic.id = ie.classroom_id  
     INNER JOIN institution_levels il ON il.id = ic.level_id 
     INNER JOIN institution_courses ic3 ON ic3.id = il.course_id 
-    INNER JOIN institution_colleges ic2 ON ic2.id = ic3.institution_college_id AND ic2.id = ie.college_id 
+    INNER JOIN institution_colleges ic2 ON ic2.id = ic3.institution_college_id 
     INNER JOIN institutions i ON i.id = ic2.institution_id  
     WHERE qup.finished = TRUE 
-    AND (q.name LIKE '%C1l%' OR q.name LIKE '%C1%')
+    AND (q.name LIKE '%Sim Geral%' OR q.name LIKE '%Geral%')
     AND i.name ILIKE '%2024%'
-    AND LOWER(ic2.name) NOT IN ('Wiquadro', 'teste', 'escola demonstração', 'escola1', 'escola2')
-    GROUP BY q.name
+    AND LOWER(ic2.name) NOT IN ('wiquadro', 'teste', 'escola demonstração', 'escola1', 'escola2')
+    GROUP BY i.name, q.name
 ),
 TodosAlunosMatriculados AS (
     SELECT 
-        'Tauá' AS municipio,  -- Fixando o valor do município
+        'Tauá' AS municipio,  -- Fixo como 'Tauá'
+        i.name AS instituicao,  -- Nome da instituição
         COUNT(DISTINCT ie.user_id) AS alunos_matriculados
     FROM 
         institution_enrollments ie
@@ -59,19 +61,20 @@ TodosAlunosMatriculados AS (
     INNER JOIN institutions i ON i.id = ic2.institution_id  
     WHERE i.name ILIKE '%2024%'
     AND LOWER(ic2.name) NOT IN ('wiquadro', 'teste', 'escola demonstração', 'escola1', 'escola2')
+    GROUP BY i.name
 )
 SELECT 
-    A.municipio,
+    A.instituicao,
     A.nome_simulado,
     A.cursos,
-    SUM(A.alunos_simulado) AS total_alunos_simulado,  
-    MAX(T.alunos_matriculados) AS total_alunos_matriculados
+    A.alunos_simulado AS total_alunos_simulado,  
+    T.alunos_matriculados AS total_alunos_matriculados
 FROM 
     TodosAlunosMatriculados T
 JOIN AlunosSimulado A 
-    ON T.municipio = A.municipio
-GROUP BY A.municipio, A.nome_simulado, A.cursos
-ORDER BY A.nome_simulado;
+    ON T.instituicao = A.instituicao
+ORDER BY A.instituicao, A.nome_simulado;
+
                             
                 """)
                 column_names = [desc[0] for desc in cur.description]
