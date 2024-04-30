@@ -1,0 +1,18 @@
+C:\Users\User\myproject\ConsultasPy-main
+
+venv\Scripts\activate
+
+set FLASK_APP=app.py
+
+flask run
+
+git init (apenas para novos repositórios)
+
+git add .
+
+git commit -m "Mensagem"
+
+
+git remote add origin *url do repositório no git* (apenas para novos repositórios)
+
+git push -u origin master

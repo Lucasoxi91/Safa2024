@@ -1,0 +1,120 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}Escolha um Script{% endblock %}
+
+{% block body %}
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário Dinâmico</title>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css' rel='stylesheet' />
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/locale/pt-br.js'></script>
+</head>
+
+<div class="container">
+    <h1>Escolha um Script para Executar</h1>
+    <form action="/execute" method="get">
+        <select name="script">
+            {% for script in scripts %}
+            <option value="{{ script }}">{{ script }}</option>
+            {% endfor %}
+        </select>
+        <select name="display">
+            <option value="tabela">Tabela</option>
+            <option value="barras">Gráfico de Barras</option>
+            <option value="pizza">Gráfico de Pizza</option>
+        </select>
+        <input type="submit" value="Executar">
+    </form>
+
+</div>
+<br> 
+<div id="calendar"></div>
+
+<script>
+    $(document).ready(function() {
+        $('#calendar').fullCalendar({
+            defaultView: 'month',
+            locale: 'pt-br',
+            // Opções e eventos do calendário aqui
+        });
+    });
+</script>
+
+<style>
+    body {
+        font-family: 'Nunito Sans', 'Segoe UI', Roboto, sans-serif;
+        background-color: #f4f7f6;
+        margin: 0;
+        padding: 20px;
+    }
+
+    #calendar {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .fc-header-toolbar {
+        margin-bottom: 20px;
+    }
+
+    .fc button {
+        background-color: #81ce87;
+        color: #ffffff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .fc button:hover {
+        background-color: #00b37d;
+    }
+
+    .fc .fc-button-primary {
+        background-color: #6e6e6e;
+        border: 1px solid #1cad40;
+    }
+
+    .fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active {
+        background-color: #24b300;
+        border-color: #46a846;
+    }
+
+    .fc-view, .fc-view > table {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    .fc-day-today {
+        background-color: #1f201f;
+        color: rgb(0, 0, 0);
+    }
+
+    .fc-event {
+        background-color: #353536;
+        border: 1px solid #3b3b3b;
+        border-radius: 4px;
+        font-size: 14px;
+        color: white;
+        cursor: pointer;
+    }
+
+    .fc-event:hover {
+        background-color: #505b66;
+    }
+</style>
+
+
+
+{% endblock %}
