@@ -28,12 +28,14 @@ WITH AlunosSimulado AS (
     SELECT 
         'Tauá' AS municipio,  -- Fixo como 'Tauá' para todos os registros
         i.name AS instituicao,  -- Nome da instituição
+        ic.name AS turma,  -- Nome da turma
+        ic2.name AS college,  -- Nome do college
         q.name AS nome_simulado,
         CASE 
             WHEN q.name LIKE '%LP%' THEN 'Língua Portuguesa'
             WHEN q.name LIKE '%MT%' THEN 'Matemática'
         END AS cursos, 
-        COUNT(DISTINCT users.id) AS alunos_simulado
+        COUNT(DISTINCT users.id) AS alunos_simulado  -- Utiliza DISTINCT para garantir contagem única
     FROM 
         quiz_user_progresses qup  
     INNER JOIN users ON users.id = qup.user_id 
@@ -48,13 +50,15 @@ WITH AlunosSimulado AS (
     AND (q.name LIKE '%Sim Geral%' OR q.name LIKE '%Geral%')
     AND i.name ILIKE '%2024%'
     AND LOWER(ic2.name) NOT IN ('wiquadro', 'teste', 'escola demonstração', 'escola1', 'escola2')
-    GROUP BY i.name, q.name
+    GROUP BY i.name, ic.name, ic2.name, q.name
 ),
 TodosAlunosMatriculados AS (
     SELECT 
         'Tauá' AS municipio,  -- Fixo como 'Tauá'
         i.name AS instituicao,  -- Nome da instituição
-        COUNT(DISTINCT ie.user_id) AS alunos_matriculados
+        ic.name AS turma,  -- Nome da turma
+        ic2.name AS college,  -- Nome do college
+        COUNT(DISTINCT ie.user_id) AS alunos_matriculados  -- Utiliza DISTINCT para garantir contagem única
     FROM 
         institution_enrollments ie
     INNER JOIN institution_classrooms ic ON ic.id = ie.classroom_id  
@@ -64,10 +68,12 @@ TodosAlunosMatriculados AS (
     INNER JOIN institutions i ON i.id = ic2.institution_id  
     WHERE i.name ILIKE '%2024%'
     AND LOWER(ic2.name) NOT IN ('wiquadro', 'teste', 'escola demonstração', 'escola1', 'escola2')
-    GROUP BY i.name
+    GROUP BY i.name, ic.name, ic2.name
 )
-SELECT 
-    A.municipio,  -- Apresenta 'Tauá' como o município para todos os registros
+SELECT DISTINCT  -- Utiliza DISTINCT para garantir que os resultados sejam únicos
+    A.municipio,
+    A.college,
+    A.turma,
     A.nome_simulado,
     A.cursos,
     A.alunos_simulado AS total_alunos_simulado,  
@@ -75,9 +81,8 @@ SELECT
 FROM 
     TodosAlunosMatriculados T
 JOIN AlunosSimulado A 
-    ON T.instituicao = A.instituicao
-ORDER BY A.instituicao, A.nome_simulado;
-
+    ON T.instituicao = A.instituicao AND T.turma = A.turma AND T.college = A.college
+ORDER BY A.college, A.turma, A.nome_simulado;
                             
                 """)
                 column_names = [desc[0] for desc in cur.description]
