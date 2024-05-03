@@ -21,6 +21,9 @@ def execute_query():
         try:
             with conn.cursor() as cur:
                 cur.execute("""
+
+
+
 WITH AlunosSimulado AS (
     SELECT 
         'Tauá' AS municipio,  -- Fixo como 'Tauá' para todos os registros
@@ -64,7 +67,7 @@ TodosAlunosMatriculados AS (
     GROUP BY i.name
 )
 SELECT 
-    A.instituicao,
+    A.municipio,  -- Apresenta 'Tauá' como o município para todos os registros
     A.nome_simulado,
     A.cursos,
     A.alunos_simulado AS total_alunos_simulado,  
