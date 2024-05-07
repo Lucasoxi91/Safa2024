@@ -35,7 +35,7 @@
             outline: none;
         }
         .table-container {
-            overflow-x: auto;  /* Habilita o scroll horizontal quando necessário */
+            overflow-x: auto;  /* Enables horizontal scrolling */
         }
         table {
             width: 100% !important;
@@ -76,14 +76,9 @@ $(document).ready(function() {
         $('#resultsTable').DataTable().clear().destroy();
     }
     $('#resultsTable').DataTable({
-        responsive: true,
+        responsive: false,  // Disable responsive features
         autoWidth: false,
-        scrollX: true,  // Ativa o scroll horizontal
-        columnDefs: [
-            { responsivePriority: 1, targets: 0 },  // Prioridade mais alta
-            { responsivePriority: 2, targets: 1 },  // Segunda prioridade
-            { responsivePriority: 10001, targets: -1 }  // Menor prioridade nas últimas colunas
-        ]
+        scrollX: true  // Enable horizontal scrolling
     });
 });
 </script>
