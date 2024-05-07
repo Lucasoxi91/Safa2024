@@ -98,9 +98,6 @@ inner JOIN EnrollmentData ed ON qd.curso = ed.curso AND qd.escola_id = ed.escola
 ORDER BY qd.curso, qd.escola, qd.simulado;
 
 
-
-
-
                 """)
                 column_names = [desc[0] for desc in cur.description]
                 results = cur.fetchall()
@@ -189,9 +186,3 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
-
-
