@@ -29,15 +29,14 @@
             background-color: #2ab31d;
             border: none;
             border-radius: 5px;
-            text-decoration: none; /* Remove o sublinhado do texto do link */
-            transition: background-color 0.2s; /* Efeito suave ao mudar de cor */
+            text-decoration: none;
+            transition: background-color 0.2s;
         }
         .btn:hover, .btn:focus {
             background-color: #00b300;
             color: #fff;
-            outline: none; /* Remove o contorno que pode aparecer ao focar o botão */
+            outline: none;
         }
-        /* Garantir que a tabela não ultrapasse os limites da tela */
         table {
             width: 100% !important;
         }
@@ -74,8 +73,25 @@ $(document).ready(function() {
         $('#resultsTable').DataTable().clear().destroy();
     }
     $('#resultsTable').DataTable({
-        responsive: true,
-        autoWidth: false  // Desativar largura automática para melhor responsividade
+        responsive: {
+            details: {
+                display: $.fn.dataTable.Responsive.display.modal({
+                    header: function (row) {
+                        var data = row.data();
+                        return 'Details for ' + data[0] + ' ' + data[1];
+                    }
+                }),
+                renderer: $.fn.dataTable.Responsive.renderer.tableAll({
+                    tableClass: 'table'
+                })
+            }
+        },
+        columnDefs: [
+            { responsivePriority: 1, targets: 0 },  // Priorize as primeiras colunas
+            { responsivePriority: 2, targets: 1 },
+            { responsivePriority: 3, targets: -1 } // Menos prioridade para as últimas colunas
+        ],
+        autoWidth: false
     });
 });
 </script>
