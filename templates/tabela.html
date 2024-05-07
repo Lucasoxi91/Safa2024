@@ -34,30 +34,36 @@
             color: #fff;
             outline: none;
         }
+        .table-container {
+            overflow-x: auto;  /* Habilita o scroll horizontal quando necessário */
+        }
         table {
             width: 100% !important;
+            margin-bottom: 0;
         }
     </style>
     <a href="https://safa2024.onrender.com/" class="btn">Voltar </a><br>
     <h1>Resultados em Tabela</h1>
-    <table id="resultsTable" class="display responsive nowrap" style="width:100%">
-        <thead>
-            <tr>
-                {% for name in column_names %}
-                <th>{{ name }}</th>
+    <div class="table-container">
+        <table id="resultsTable" class="display responsive nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    {% for name in column_names %}
+                    <th>{{ name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in query_results %}
+                <tr>
+                    {% for cell in row %}
+                    <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
                 {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in query_results %}
-            <tr>
-                {% for cell in row %}
-                <td>{{ cell }}</td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
     <form action="/download_csv" method="post">
         <input type="hidden" name="script" value="{{ request.form.script }}">
         <input type="submit" value="Download CSV">
@@ -72,6 +78,7 @@ $(document).ready(function() {
     $('#resultsTable').DataTable({
         responsive: true,
         autoWidth: false,
+        scrollX: true,  // Ativa o scroll horizontal
         columnDefs: [
             { responsivePriority: 1, targets: 0 },  // Prioridade mais alta
             { responsivePriority: 2, targets: 1 },  // Segunda prioridade
