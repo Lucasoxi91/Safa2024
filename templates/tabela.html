@@ -17,11 +17,8 @@
             align-items: center;
         }
         .btn {
-            top: 10px;
-            right: 10px;
             font-size: 14px;
             padding: 8px 16px;
-            position: absolute;
             display: inline-block;
             cursor: pointer;
             text-align: center;
@@ -43,7 +40,7 @@
     </style>
     <a href="https://safa2024.onrender.com/" class="btn">Voltar </a><br>
     <h1>Resultados em Tabela</h1>
-    <table id="resultsTable" class="display responsive nowrap">
+    <table id="resultsTable" class="display responsive nowrap" style="width:100%">
         <thead>
             <tr>
                 {% for name in column_names %}
@@ -73,25 +70,13 @@ $(document).ready(function() {
         $('#resultsTable').DataTable().clear().destroy();
     }
     $('#resultsTable').DataTable({
-        responsive: {
-            details: {
-                display: $.fn.dataTable.Responsive.display.modal({
-                    header: function (row) {
-                        var data = row.data();
-                        return 'Details for ' + data[0] + ' ' + data[1];
-                    }
-                }),
-                renderer: $.fn.dataTable.Responsive.renderer.tableAll({
-                    tableClass: 'table'
-                })
-            }
-        },
+        responsive: true,
+        autoWidth: false,
         columnDefs: [
-            { responsivePriority: 1, targets: 0 },  // Priorize as primeiras colunas
-            { responsivePriority: 2, targets: 1 },
-            { responsivePriority: 3, targets: -1 } // Menos prioridade para as últimas colunas
-        ],
-        autoWidth: false
+            { responsivePriority: 1, targets: 0 },  // Prioridade mais alta
+            { responsivePriority: 2, targets: 1 },  // Segunda prioridade
+            { responsivePriority: 10001, targets: -1 }  // Menor prioridade nas últimas colunas
+        ]
     });
 });
 </script>
