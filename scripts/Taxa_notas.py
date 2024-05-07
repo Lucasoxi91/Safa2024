@@ -28,7 +28,7 @@ WITH QuizData AS (
         ic2.id as escola_id,
         q.name as simulado,
         count(users.id) as n_user_id,
-        avg(qg.average)::numeric(10,4) as grade_avg  -- Média de notas formatada com precisão
+        ROUND(AVG(qg.average)::numeric, 1) as grade_avg  -- Média de notas arredondada para uma casa decimal
     FROM 
         quiz_user_progresses qup  
     INNER JOIN users on qup.user_id = users.id 
@@ -44,7 +44,7 @@ WITH QuizData AS (
     INNER JOIN institutions_quizzes iq on iq.institution_id = i.id and iq.quiz_id = q.id
     INNER JOIN quiz_grades qg on qg.user_id = users.id and qg.quiz_id = q.id 
     WHERE qup.finished = true 
-    AND i.name ILIKE '%2024%'  -- Inclui todas as instituições com '2024' no nome
+    AND i.name ILIKE '%2024%'
     AND LOWER(ic2.name) NOT IN ('wiquadro', 'teste', 'escola demonstração', 'escola1', 'escola2')
     GROUP BY i.name, ic2.name, ic2.id, q.name
 ), 
@@ -61,7 +61,7 @@ EnrollmentData AS (
     INNER JOIN institution_colleges ic2 on ic2.id = ic3.institution_college_id  
     INNER JOIN institutions i on i.id = ic2.institution_id  
     INNER JOIN institution_enrollments ie on ie.institution_id = i.id and ie.classroom_id = ic.id and ie.college_id = ic2.id 
-    WHERE i.name ILIKE '%2024%'  -- Inclui todas as instituições com '2024' no nome
+    WHERE i.name ILIKE '%2024%'
     AND LOWER(ic2.name) NOT IN ('wiquadro', 'teste', 'escola demonstração', 'escola1', 'escola2')
     GROUP BY i.name, ic2.name, ic2.id
 )
@@ -71,8 +71,8 @@ SELECT
     qd.simulado,
     qd.n_user_id as finalizaram,
     ed.matriculados,
-    ROUND((CAST(qd.n_user_id AS numeric) / GREATEST(ed.matriculados, 1)) * 100, 4) AS participation,
-    qd.grade_avg  -- Adicionado à seleção para exibir na tabela final
+    ROUND((CAST(qd.n_user_id AS numeric) / GREATEST(ed.matriculados, 1)) * 100, 1) AS participation,  -- Arredondado para uma casa decimal
+    qd.grade_avg
 FROM QuizData qd
 INNER JOIN EnrollmentData ed ON qd.curso = ed.curso AND qd.escola_id = ed.escola_id
 ORDER BY qd.curso, qd.escola, qd.simulado;
