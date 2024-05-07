@@ -26,16 +26,15 @@ def execute_query():
 WITH AlunosSimulado AS (
     SELECT 
         'Tauá' AS municipio,
-        i.name AS instituicao,
-        ic.name AS turma,
         ic2.name AS college,
+        ic.name AS turma,
         q.name AS nome_simulado,
         CASE 
             WHEN q.name LIKE '%LP%' THEN 'Língua Portuguesa'
             WHEN q.name LIKE '%MT%' THEN 'Matemática'
         END AS cursos, 
         COUNT(DISTINCT users.id) AS alunos_simulado,
-        AVG(qg.average)::NUMERIC(10,4) AS avg_grade  -- Convertendo para NUMERIC para garantir compatibilidade
+        AVG(qg.average)::NUMERIC(10,1) AS avg_grade
     FROM 
         quiz_user_progresses qup  
     INNER JOIN users ON users.id = qup.user_id 
@@ -44,21 +43,20 @@ WITH AlunosSimulado AS (
     INNER JOIN institution_classrooms ic ON ic.id = ie.classroom_id  
     INNER JOIN institution_levels il ON il.id = ic.level_id 
     INNER JOIN institution_courses ic3 ON ic3.id = il.course_id 
-    INNER JOIN institution_colleges ic2 ON ic2.id = ic3.institution_college_id 
+    INNER JOIN institution_colleges ic2 ON ic2.id = ic3.institution_college_id
     INNER JOIN institutions i ON i.id = ic2.institution_id  
     INNER JOIN quiz_grades qg ON qg.user_id = users.id AND qg.quiz_id = q.id
     WHERE qup.finished = TRUE 
     AND (q.name LIKE '%Sim Geral%' OR q.name LIKE '%Geral%')
     AND i.name ILIKE '%2024%'
     AND LOWER(ic2.name) NOT IN ('wiquadro', 'teste', 'escola demonstração', 'escola1', 'escola2')
-    GROUP BY i.name, ic.name, ic2.name, q.name
+    GROUP BY ic2.name, ic.name, q.name
 ),
 TodosAlunosMatriculados AS (
     SELECT 
         'Tauá' AS municipio,
-        i.name AS instituicao,
-        ic.name AS turma,
         ic2.name AS college,
+        ic.name AS turma,
         COUNT(DISTINCT ie.user_id) AS alunos_matriculados
     FROM 
         institution_enrollments ie
@@ -69,23 +67,24 @@ TodosAlunosMatriculados AS (
     INNER JOIN institutions i ON i.id = ic2.institution_id  
     WHERE i.name ILIKE '%2024%'
     AND LOWER(ic2.name) NOT IN ('wiquadro', 'teste', 'escola demonstração', 'escola1', 'escola2')
-    GROUP BY i.name, ic.name, ic2.name
+    GROUP BY ic2.name, ic.name
 )
-SELECT 
+SELECT DISTINCT
     A.municipio,
     A.college,
     A.turma,
     A.nome_simulado,
     A.cursos,
-    A.alunos_simulado AS total_alunos_simulado,
+    A.alunos_simulado AS total_alunos_simulado,  
     T.alunos_matriculados AS total_alunos_matriculados,
-    ROUND(A.avg_grade, 1) AS avg_grade,
-    ROUND((A.alunos_simulado::DECIMAL / GREATEST(T.alunos_matriculados, 1)) * 100, 1) AS participation_rate
+    A.avg_grade,
+    ROUND((A.alunos_simulado::DECIMAL / GREATEST(T.alunos_matriculados, 1)) * 100, 1) AS taxa_participacao
 FROM 
     TodosAlunosMatriculados T
 JOIN AlunosSimulado A 
-    ON T.instituicao = A.instituicao AND T.turma = A.turma AND T.college = A.college
+    ON T.college = A.college AND T.turma = A.turma
 ORDER BY A.college, A.turma, A.nome_simulado;
+
 
                             
                 """)
