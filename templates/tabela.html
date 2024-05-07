@@ -37,10 +37,14 @@
             color: #fff;
             outline: none; /* Remove o contorno que pode aparecer ao focar o botão */
         }
+        /* Garantir que a tabela não ultrapasse os limites da tela */
+        table {
+            width: 100% !important;
+        }
     </style>
-      <a href="https://safa2024.onrender.com/" class="btn">Voltar </a><br>
+    <a href="https://safa2024.onrender.com/" class="btn">Voltar </a><br>
     <h1>Resultados em Tabela</h1>
-    <table id="resultsTable" class="display responsive nowrap" style="width:100%">
+    <table id="resultsTable" class="display responsive nowrap">
         <thead>
             <tr>
                 {% for name in column_names %}
@@ -70,7 +74,8 @@ $(document).ready(function() {
         $('#resultsTable').DataTable().clear().destroy();
     }
     $('#resultsTable').DataTable({
-        responsive: true
+        responsive: true,
+        autoWidth: false  // Desativar largura automática para melhor responsividade
     });
 });
 </script>
